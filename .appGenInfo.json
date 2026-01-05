@@ -1,0 +1,24 @@
+{
+  "generationParameters": {
+    "generationDate": "Mon Jan 05 2026 16:21:26 GMT+0000 (Coordinated Universal Time)",
+    "generatorPlatform": "SAP Business Application Studio",
+    "serviceType": "OData URL",
+    "metadataFilename": "",
+    "serviceUrl": "https://services.odata.org/V2/(S(3pfnqdv54hbxmgvv1slnftxy))/OData/OData.svc",
+    "appName": "course-project",
+    "appTitle": "Suppliers list and details",
+    "appDescription": "Beadandó projekt az SAP UI5 Frontend képzés kurzusra",
+    "appNamespace": "",
+    "ui5Theme": "sap_horizon_dark",
+    "ui5Version": "1.143.2",
+    "enableCodeAssist": true,
+    "enableEslint": true,
+    "enableTypeScript": true,
+    "showMockDataInfo": true,
+    "generatorVersion": "1.20.0",
+    "template": "Basic V2",
+    "generatorName": "SAP Fiori Application Generator",
+    "entityRelatedConfig": [],
+    "launchText": "To launch the generated application, run the following from the generated application root folder:\n\n```\n    npm start\n```"
+  }
+}
