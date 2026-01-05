@@ -3,5 +3,39 @@
   xmlns:mvc="sap.ui.core.mvc"
   xmlns="sap.m"
 >
-  <Page id="page" title="{i18n>title}" />
+  <Page id="suppliersPage" title="{i18n>supplierListTitle}">
+    <headerContent>
+      <Button icon="sap-icon://add" text="{i18n>createButton}" press="onOpenCreateSupplier" />
+    </headerContent>
+
+    <content>
+      <Table id="suppliersTable" items="{/Suppliers}">
+        <columns>
+          <Column>
+            <Text text="{i18n>supplierName}" />
+          </Column>
+          <Column>
+            <Text text="{i18n>supplierZip}" />
+          </Column>
+          <Column>
+            <Text text="{i18n>supplierCity}" />
+          </Column>
+          <Column hAlign="End">
+            <Text text="" />
+          </Column>
+        </columns>
+
+        <items>
+          <ColumnListItem>
+            <cells>
+              <Text text="{Name}" />
+              <Text text="{Address/ZipCode}" />
+              <Text text="{Address/City}" />
+              <Link text="{i18n>supplierDetailsLink}" press="onDetailsPressed" />
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
+    </content>
+  </Page>
 </mvc:View>

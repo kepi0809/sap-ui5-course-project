@@ -1,0 +1,32 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:f="sap.ui.layout.form">
+  <Dialog id="supplierDialog" stretchOnPhone="true" title="{SupplierFormModel>/title}">
+    <content>
+      <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
+        <f:content>
+          <Label text="{i18n>supplierName}" />
+          <Input value="{SupplierFormModel>/Name}" />
+
+          <Label text="{i18n>supplierStreet}" />
+          <Input value="{SupplierFormModel>/Street}" />
+
+          <Label text="{i18n>supplierCity}" />
+          <Input value="{SupplierFormModel>/City}" />
+
+          <Label text="{i18n>supplierState}" />
+          <Input value="{SupplierFormModel>/State}" />
+
+          <Label text="{i18n>supplierZip}" />
+          <Input value="{SupplierFormModel>/ZipCode}" />
+
+          <Label text="{i18n>supplierCountry}" />
+          <Input value="{SupplierFormModel>/Country}" />
+        </f:content>
+      </f:SimpleForm>
+    </content>
+
+    <buttons>
+      <Button text="{i18n>button_cancel}" press="onSupplierDialogClose" />
+      <Button text="{i18n>button_save}" type="Emphasized" press="onSaveSupplier" />
+    </buttons>
+  </Dialog>
+</core:FragmentDefinition>

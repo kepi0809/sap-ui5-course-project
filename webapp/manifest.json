@@ -93,12 +93,20 @@
           "name": "RouteSupplierList",
           "pattern": ":?query:",
           "target": ["TargetSupplierList"]
+        },
+        {
+          "name": "RouteSupplierDetails",
+          "pattern": "suppliers/{SupplierId}",
+          "target": "TargetSupplierDetails"
         }
       ],
       "targets": {
         "TargetSupplierList": {
           "id": "SupplierList",
           "name": "SupplierList"
+        },
+        "TargetSupplierDetails": {
+          "viewName": "SupplierDetails"
         }
       }
     },
