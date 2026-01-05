@@ -1,4 +1,7 @@
 {
-  "extends": "plugin:@sap-ux/eslint-plugin-fiori-tools/defaultTS",
-  "root": true
+    "extends": "plugin:@sap-ux/eslint-plugin-fiori-tools/defaultTS",
+    "root": true,
+    "rules": {
+        "no-console": "warning"
+    }
 }

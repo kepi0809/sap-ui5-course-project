@@ -1,0 +1,40 @@
+{
+  // --- Format settings ---
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": false,
+
+  "[xml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "files.associations": {
+    "**/*.view.xml": "xml",
+    "**/*.fragment.xml": "xml",
+    "**/*.xml": "xml"
+  },
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "always"
+  },
+
+  "prettier.enable": true,
+  "json.schemaDownload.enable": false,
+
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": [
+          "entity.name.tag", // tag name: <Page>, <mvc:View>, <List>...
+          "meta.tag" // whole tag meta
+        ],
+        "settings": {
+          "foreground": "#4FC3F7", // pick any hex color you like
+          "fontStyle": ""
+        }
+      }
+    ]
+  }
+}
