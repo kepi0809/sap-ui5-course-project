@@ -26,7 +26,12 @@
     </headerContent>
 
     <content>
-      <VBox id="detailsFormBox" busy="{view>/busy}" busyIndicatorDelay="0">
+      <VBox
+        id="detailsFormBox"
+        busy="{view>/busy}"
+        class="sapUiSmallMarginTop"
+        busyIndicatorDelay="0"
+      >
         <f:SimpleForm id="supplierDetailsForm" editable="false" layout="ResponsiveGridLayout">
           <f:content>
             <Label text="ID" />
@@ -55,6 +60,37 @@
           </f:content>
         </f:SimpleForm>
       </VBox>
+
+      <Title
+        text="{i18n>titleCategories}"
+        level="H2"
+        class="sapUiMediumMarginTop sapUiSmallMarginBottom"
+      />
+      <Table
+        id="categoriesTable"
+        items="{CategoriesModel>/items}"
+        noDataText="{i18n>noCategories}"
+        busy="{CategoriesModel>/busy}"
+        busyIndicatorDelay="0"
+      >
+        <columns>
+          <Column>
+            <Text text="{i18n>columnCategoryName}" />
+          </Column>
+          <Column>
+            <Text text="{i18n>columnCategoryDescription}" />
+          </Column>
+        </columns>
+
+        <items>
+          <ColumnListItem>
+            <cells>
+              <Text text="{CategoriesModel>Name}" />
+              <Text text="{CategoriesModel>Description}" />
+            </cells>
+          </ColumnListItem>
+        </items>
+      </Table>
     </content>
   </Page>
 </mvc:View>

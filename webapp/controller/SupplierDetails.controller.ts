@@ -4,6 +4,8 @@ import type Event from "sap/ui/base/Event";
 import Controller from "sap/ui/core/mvc/Controller";
 import History from "sap/ui/core/routing/History";
 import UIComponent from "sap/ui/core/UIComponent";
+import Filter from "sap/ui/model/Filter";
+import FilterOperator from "sap/ui/model/FilterOperator";
 import JSONModel from "sap/ui/model/json/JSONModel";
 
 type RouteMatchedParams = {
@@ -17,6 +19,7 @@ export default class SupplierDetails extends Controller {
 
   public onInit(): void {
     this.getView().setModel(new JSONModel({ busy: true }), "view");
+    this.getView().setModel(new JSONModel({ busy: false, items: [] }), "CategoriesModel");
 
     UIComponent.getRouterFor(this)
       .getRoute("RouteSupplierDetails")
@@ -25,30 +28,27 @@ export default class SupplierDetails extends Controller {
 
   private onRouteMatched(oEvent: Event<RouteMatchedParams>): void {
     const sSupplierId = oEvent.getParameter("arguments").SupplierId;
-    if (!sSupplierId) {
-      return;
-    }
+    if (!sSupplierId) return;
 
     const oViewModel = this.getView().getModel("view") as JSONModel;
     oViewModel.setProperty("/busy", true);
 
-    const sPath = `/Suppliers(${encodeURIComponent(String(sSupplierId))})`;
+    const iSupplierId = Number(sSupplierId);
 
     this.getView().bindElement({
-      path: sPath,
+      path: `/Suppliers(${encodeURIComponent(String(sSupplierId))})`,
       events: {
         dataRequested: () => oViewModel.setProperty("/busy", true),
         dataReceived: () => oViewModel.setProperty("/busy", false),
       },
     });
 
-    // cached data case: no request -> no dataReceived
     setTimeout(() => {
       const oCtx = this.getView().getBindingContext();
-      if (oCtx && oCtx.getObject()) {
-        oViewModel.setProperty("/busy", false);
-      }
+      if (oCtx && oCtx.getObject()) oViewModel.setProperty("/busy", false);
     }, 0);
+
+    this.loadCategoriesForSupplier(iSupplierId);
   }
 
   public onNavBack(): void {
@@ -186,5 +186,54 @@ export default class SupplierDetails extends Controller {
         },
       }
     );
+  }
+
+  private loadCategoriesForSupplier(iSupplierId: number): void {
+    const oCategoriesModel = this.getView().getModel("CategoriesModel") as JSONModel;
+    oCategoriesModel.setProperty("/busy", true);
+    oCategoriesModel.setProperty("/items", []);
+
+    const oModel: any = this.getView().getModel();
+
+    oModel.read("/Products", {
+      headers: { "Content-ID": 1 },
+      filters: [
+        new Filter({
+          path: "Supplier/ID",
+          operator: FilterOperator.EQ,
+          value1: iSupplierId,
+        }),
+      ],
+      urlParameters: {
+        $expand: "Category",
+      },
+      success: (oData: any) => {
+        const aResults: any[] = oData?.results ?? [];
+
+        const mById = new Map<number, any>();
+
+        for (const oProduct of aResults) {
+          const oCat = oProduct?.Category;
+          if (!oCat) continue;
+
+          const iCatId = Number(oCat.ID);
+          if (!mById.has(iCatId)) {
+            mById.set(iCatId, {
+              ID: iCatId,
+              Name: oCat.Name ?? "",
+              Description: oCat.Description ?? "",
+            });
+          }
+        }
+
+        oCategoriesModel.setProperty("/items", Array.from(mById.values()));
+        oCategoriesModel.setProperty("/busy", false);
+      },
+      error: (err: any) => {
+        console.log("Categories load error:", err);
+        console.log("Categories load error.responseText:", err?.responseText);
+        oCategoriesModel.setProperty("/busy", false);
+      },
+    });
   }
 }
