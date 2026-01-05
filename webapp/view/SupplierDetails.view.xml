@@ -26,36 +26,31 @@
     </headerContent>
 
     <content>
-      <VBox
-        id="detailsFormBox"
-        busy="{view>/busy}"
-        class="sapUiSmallMarginTop"
-        busyIndicatorDelay="0"
-      >
+      <VBox id="detailsFormBox" busy="{view>/busy}" busyIndicatorDelay="0">
         <f:SimpleForm id="supplierDetailsForm" editable="false" layout="ResponsiveGridLayout">
           <f:content>
-            <Label text="ID" />
+            <Label text="{i18n>supplierId}" />
             <Text text="{ID}" />
 
-            <Label text="Name" />
+            <Label text="{i18n>supplierName}" />
             <Text text="{Name}" />
 
-            <Label text="Street" />
+            <Label text="{i18n>supplierStreet}" />
             <Text text="{Address/Street}" />
 
-            <Label text="City" />
+            <Label text="{i18n>supplierCity}" />
             <Text text="{Address/City}" />
 
-            <Label text="State" />
+            <Label text="{i18n>supplierState}" />
             <Text text="{Address/State}" />
 
-            <Label text="Zip code" />
+            <Label text="{i18n>supplierZip}" />
             <Text text="{Address/ZipCode}" />
 
-            <Label text="Country" />
+            <Label text="{i18n>supplierCountry}" />
             <Text text="{Address/Country}" />
 
-            <Label text="Concurrency" />
+            <Label text="{i18n>supplierConcurrency}" />
             <Text text="{Concurrency}" />
           </f:content>
         </f:SimpleForm>
