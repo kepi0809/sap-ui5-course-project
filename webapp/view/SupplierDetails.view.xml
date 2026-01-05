@@ -1,0 +1,49 @@
+<mvc:View
+  controllerName="courseproject.controller.SupplierDetails"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:f="sap.ui.layout.form"
+>
+  <Page
+    id="supplierDetailsPage"
+    title="{i18n>supplierDetailsTitle}"
+    showNavButton="true"
+    navButtonPress="onNavBack"
+  >
+    <headerContent>
+      <Button icon="sap-icon://edit" text="{i18n>button_edit}" press="onOpenEditSupplier" />
+    </headerContent>
+
+    <content>
+      <VBox id="detailsFormBox" busy="{view>/busy}" busyIndicatorDelay="0">
+        <f:SimpleForm id="supplierDetailsForm" editable="false" layout="ResponsiveGridLayout">
+          <f:content>
+            <Label text="ID" />
+            <Text text="{ID}" />
+
+            <Label text="Name" />
+            <Text text="{Name}" />
+
+            <Label text="Street" />
+            <Text text="{Address/Street}" />
+
+            <Label text="City" />
+            <Text text="{Address/City}" />
+
+            <Label text="State" />
+            <Text text="{Address/State}" />
+
+            <Label text="Zip code" />
+            <Text text="{Address/ZipCode}" />
+
+            <Label text="Country" />
+            <Text text="{Address/Country}" />
+
+            <Label text="Concurrency" />
+            <Text text="{Concurrency}" />
+          </f:content>
+        </f:SimpleForm>
+      </VBox>
+    </content>
+  </Page>
+</mvc:View>
