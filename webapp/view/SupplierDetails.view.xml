@@ -11,7 +11,18 @@
     navButtonPress="onNavBack"
   >
     <headerContent>
-      <Button icon="sap-icon://edit" text="{i18n>button_edit}" press="onOpenEditSupplier" />
+      <Button
+        icon="sap-icon://delete"
+        type="Neutral"
+        text="{i18n>button_delete}"
+        press="onDeleteSupplier"
+      />
+      <Button
+        icon="sap-icon://edit"
+        type="Neutral"
+        text="{i18n>button_edit}"
+        press="onOpenEditSupplier"
+      />
     </headerContent>
 
     <content>

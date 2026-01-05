@@ -133,9 +133,7 @@ export default class SupplierDetails extends Controller {
 
     oModel.update(sPath, oPayload, {
       merge: true,
-      headers: {
-        "Content-ID": 1,
-      },
+      headers: { "Content-ID": 1 },
       success: () => {
         MessageToast.show("Supplier updated");
         this.onSupplierDialogClose(oEvent);
@@ -149,5 +147,44 @@ export default class SupplierDetails extends Controller {
         MessageBox.error("Update failed. Check console for details.");
       },
     });
+  }
+
+  public onDeleteSupplier(): void {
+    const oCtx = this.getView().getBindingContext();
+    const sPath = oCtx?.getPath();
+
+    if (!sPath) {
+      MessageBox.error("Supplier not loaded yet.");
+      return;
+    }
+
+    MessageBox.confirm(
+      this.getView().getModel("i18n")?.getResourceBundle().getText("supplierDeleteButton"),
+      {
+        actions: [MessageBox.Action.DELETE, MessageBox.Action.CANCEL],
+        emphasizedAction: MessageBox.Action.DELETE,
+        onClose: (sAction) => {
+          if (sAction !== MessageBox.Action.DELETE) {
+            return;
+          }
+
+          const oModel: any = this.getView().getModel();
+          oModel.remove(sPath, {
+            headers: { "Content-ID": 1 },
+            success: () => {
+              MessageToast.show(
+                this.getView().getModel("i18n")?.getResourceBundle().getText("supplier_deleted")
+              );
+              UIComponent.getRouterFor(this).navTo("RouteSupplierList", {}, true);
+            },
+            error: (err: any) => {
+              console.log("DELETE Supplier error:", err);
+              console.log(err?.responseText);
+              MessageBox.error("Delete failed.");
+            },
+          });
+        },
+      }
+    );
   }
 }
