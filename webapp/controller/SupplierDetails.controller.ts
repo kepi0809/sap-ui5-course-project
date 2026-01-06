@@ -1,3 +1,6 @@
+import { t } from "courseproject/util/i18n";
+import type Button from "sap/m/Button";
+import type Dialog from "sap/m/Dialog";
 import MessageBox from "sap/m/MessageBox";
 import MessageToast from "sap/m/MessageToast";
 import type Event from "sap/ui/base/Event";
@@ -8,34 +11,33 @@ import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
 import JSONModel from "sap/ui/model/json/JSONModel";
 
-type RouteMatchedParams = {
-  arguments: {
-    SupplierId: string;
-  };
-};
-
 export default class SupplierDetails extends Controller {
-  private _supplierDialog?: sap.m.Dialog;
+  private _supplierDialog?: Dialog;
 
   public onInit(): void {
-    this.getView().setModel(new JSONModel({ busy: true }), "view");
-    this.getView().setModel(new JSONModel({ busy: false, items: [] }), "CategoriesModel");
+    this.getView()?.setModel(new JSONModel({ busy: true }), "view");
+    this.getView()?.setModel(new JSONModel({ busy: false, items: [] }), "CategoriesModel");
 
     UIComponent.getRouterFor(this)
       .getRoute("RouteSupplierDetails")
       ?.attachPatternMatched(this.onRouteMatched, this);
   }
 
-  private onRouteMatched(oEvent: Event<RouteMatchedParams>): void {
-    const sSupplierId = oEvent.getParameter("arguments").SupplierId;
-    if (!sSupplierId) return;
+  private onRouteMatched(oEvent: Event): void {
+    // * couldn't fix it cleanly
+    const oArgs = (oEvent as any).getParameter("arguments") as { SupplierId?: string } | undefined;
+    const sSupplierId = oArgs?.SupplierId;
 
-    const oViewModel = this.getView().getModel("view") as JSONModel;
+    if (!sSupplierId) {
+      return;
+    }
+
+    const oViewModel = this.getView()?.getModel("view") as JSONModel;
     oViewModel.setProperty("/busy", true);
 
     const iSupplierId = Number(sSupplierId);
 
-    this.getView().bindElement({
+    this.getView()?.bindElement({
       path: `/Suppliers(${encodeURIComponent(String(sSupplierId))})`,
       events: {
         dataRequested: () => oViewModel.setProperty("/busy", true),
@@ -44,8 +46,10 @@ export default class SupplierDetails extends Controller {
     });
 
     setTimeout(() => {
-      const oCtx = this.getView().getBindingContext();
-      if (oCtx && oCtx.getObject()) oViewModel.setProperty("/busy", false);
+      const oCtx = this.getView()?.getBindingContext();
+      if (oCtx && oCtx.getObject()) {
+        oViewModel.setProperty("/busy", false);
+      }
     }, 0);
 
     this.loadCategoriesForSupplier(iSupplierId);
@@ -53,31 +57,25 @@ export default class SupplierDetails extends Controller {
 
   public onNavBack(): void {
     const sPrevHash = History.getInstance().getPreviousHash();
-    if (sPrevHash !== undefined) {
-      window.history.go(-1);
-      return;
-    }
+    if (sPrevHash !== undefined) return window.history.go(-1);
+
     UIComponent.getRouterFor(this).navTo("RouteSupplierList", {}, true);
   }
 
   public onOpenEditSupplier(): void {
-    const oCtx = this.getView().getBindingContext();
+    const oCtx = this.getView()?.getBindingContext();
     const oSupplier = oCtx?.getObject() as any;
 
-    if (!oCtx || !oSupplier) {
-      MessageBox.error("Supplier not loaded yet.");
-      return;
-    }
+    if (!oCtx || !oSupplier) return MessageBox.error(t(this.getView(), "errorSupplierNotLoaded"));
 
-    if (!this.getOwnerComponent().getModel("SupplierFormModel")) {
-      this.getOwnerComponent().setModel(new JSONModel(), "SupplierFormModel");
-    }
+    if (!this.getOwnerComponent()?.getModel("SupplierFormModel"))
+      this.getOwnerComponent()?.setModel(new JSONModel(), "SupplierFormModel");
 
-    const oFormModel = this.getOwnerComponent().getModel("SupplierFormModel") as JSONModel;
+    const oFormModel = this.getOwnerComponent()?.getModel("SupplierFormModel") as JSONModel;
 
     oFormModel.setData({
       mode: "edit",
-      title: "Edit supplier",
+      title: t(this.getView(), "titleEditSupplier"),
       path: oCtx.getPath(),
       ID: oSupplier.ID ?? null,
       Name: oSupplier.Name ?? "",
@@ -93,29 +91,27 @@ export default class SupplierDetails extends Controller {
       this._supplierDialog = sap.ui.xmlfragment(
         "courseproject.view.fragments.SupplierDialog",
         this
-      ) as sap.m.Dialog;
+      ) as Dialog;
 
-      this.getView().addDependent(this._supplierDialog);
+      this.getView()?.addDependent(this._supplierDialog);
     }
 
     this._supplierDialog.open();
   }
 
-  public onSupplierDialogClose(oEvent: sap.ui.base.Event): void {
-    const oButton = oEvent.getSource() as sap.m.Button;
-    const oDialog = oButton.getParent() as sap.m.Dialog;
+  public onSupplierDialogClose(oEvent: Event): void {
+    const oButton = oEvent.getSource() as Button;
+    const oDialog = oButton.getParent() as Dialog;
     oDialog.close();
   }
 
-  public onSaveSupplier(oEvent: sap.ui.base.Event): void {
-    const oFormModel = this.getOwnerComponent().getModel("SupplierFormModel") as JSONModel;
+  public onSaveSupplier(oEvent: Event): void {
+    const oFormModel = this.getOwnerComponent()?.getModel("SupplierFormModel") as JSONModel;
     const sMode = oFormModel.getProperty("/mode");
     const sPath = oFormModel.getProperty("/path");
 
-    if (sMode !== "edit" || !sPath) {
-      MessageBox.error("This dialog is not in edit mode.");
-      return;
-    }
+    if (sMode !== "edit" || !sPath)
+      return MessageBox.error(t(this.getView(), "errorNotInEditMode"));
 
     const oPayload: any = {
       Name: oFormModel.getProperty("/Name"),
@@ -129,71 +125,53 @@ export default class SupplierDetails extends Controller {
       Concurrency: oFormModel.getProperty("/Concurrency"),
     };
 
-    const oModel: any = this.getView().getModel();
+    const oModel: any = this.getView()?.getModel();
 
     oModel.update(sPath, oPayload, {
       merge: true,
       headers: { "Content-ID": 1 },
       success: () => {
-        MessageToast.show("Supplier updated");
+        MessageToast.show(t(this.getView(), "supplierUpdated"));
         this.onSupplierDialogClose(oEvent);
 
         // refresh details binding
         oModel.refresh(true);
       },
-      error: (err: any) => {
-        console.log("UPDATE Supplier error:", err);
-        console.log("UPDATE Supplier error.responseText:", err?.responseText);
-        MessageBox.error("Update failed. Check console for details.");
-      },
+      error: () => MessageBox.error(t(this.getView(), "errorUpdateFailed")),
     });
   }
 
   public onDeleteSupplier(): void {
-    const oCtx = this.getView().getBindingContext();
+    const oCtx = this.getView()?.getBindingContext();
     const sPath = oCtx?.getPath();
 
-    if (!sPath) {
-      MessageBox.error("Supplier not loaded yet.");
-      return;
-    }
+    if (!sPath) return MessageBox.error(t(this.getView(), "errorSupplierNotLoaded"));
 
-    MessageBox.confirm(
-      this.getView().getModel("i18n")?.getResourceBundle().getText("supplierDeleteButton"),
-      {
-        actions: [MessageBox.Action.DELETE, MessageBox.Action.CANCEL],
-        emphasizedAction: MessageBox.Action.DELETE,
-        onClose: (sAction) => {
-          if (sAction !== MessageBox.Action.DELETE) {
-            return;
-          }
+    MessageBox.confirm(t(this.getView(), "supplierDeleteButton"), {
+      actions: [MessageBox.Action.DELETE, MessageBox.Action.CANCEL],
+      emphasizedAction: MessageBox.Action.DELETE,
+      onClose: (sAction) => {
+        if (sAction !== MessageBox.Action.DELETE) return;
 
-          const oModel: any = this.getView().getModel();
-          oModel.remove(sPath, {
-            headers: { "Content-ID": 1 },
-            success: () => {
-              MessageToast.show(
-                this.getView().getModel("i18n")?.getResourceBundle().getText("supplier_deleted")
-              );
-              UIComponent.getRouterFor(this).navTo("RouteSupplierList", {}, true);
-            },
-            error: (err: any) => {
-              console.log("DELETE Supplier error:", err);
-              console.log(err?.responseText);
-              MessageBox.error("Delete failed.");
-            },
-          });
-        },
-      }
-    );
+        const oModel: any = this.getView()?.getModel();
+        oModel.remove(sPath, {
+          headers: { "Content-ID": 1 },
+          success: () => {
+            MessageToast.show(t(this.getView(), "supplier_deleted"));
+            UIComponent.getRouterFor(this).navTo("RouteSupplierList", {}, true);
+          },
+          error: () => MessageBox.error(t(this.getView(), "errorDeleteFailed")),
+        });
+      },
+    });
   }
 
   private loadCategoriesForSupplier(iSupplierId: number): void {
-    const oCategoriesModel = this.getView().getModel("CategoriesModel") as JSONModel;
+    const oCategoriesModel = this.getView()?.getModel("CategoriesModel") as JSONModel;
     oCategoriesModel.setProperty("/busy", true);
     oCategoriesModel.setProperty("/items", []);
 
-    const oModel: any = this.getView().getModel();
+    const oModel: any = this.getView()?.getModel();
 
     oModel.read("/Products", {
       headers: { "Content-ID": 1 },
@@ -229,11 +207,7 @@ export default class SupplierDetails extends Controller {
         oCategoriesModel.setProperty("/items", Array.from(mById.values()));
         oCategoriesModel.setProperty("/busy", false);
       },
-      error: (err: any) => {
-        console.log("Categories load error:", err);
-        console.log("Categories load error.responseText:", err?.responseText);
-        oCategoriesModel.setProperty("/busy", false);
-      },
+      error: () => oCategoriesModel.setProperty("/busy", false),
     });
   }
 }

@@ -9,7 +9,13 @@
     </headerContent>
 
     <content>
-      <Table id="suppliersTable" items="{/Suppliers}">
+      <Table
+        id="suppliersTable"
+        items="{/Suppliers}"
+        noDataText="{i18n>noSuppliers}"
+        growing="true"
+        growingScrollToLoad="true"
+      >
         <columns>
           <Column>
             <Text text="{i18n>supplierName}" />

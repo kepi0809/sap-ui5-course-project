@@ -1,17 +1,21 @@
+import { t } from "courseproject/util/i18n";
+import type Button from "sap/m/Button";
+import type Dialog from "sap/m/Dialog";
 import MessageBox from "sap/m/MessageBox";
 import MessageToast from "sap/m/MessageToast";
 import type Event from "sap/ui/base/Event";
+import type Control from "sap/ui/core/Control";
 import Controller from "sap/ui/core/mvc/Controller";
 import UIComponent from "sap/ui/core/UIComponent";
 import JSONModel from "sap/ui/model/json/JSONModel";
 
 export default class SupplierList extends Controller {
-  private _supplierDialog?: sap.m.Dialog;
-
-  public onInit(): void {}
+  private _supplierDialog?: Dialog;
 
   public onDetailsPressed(oEvent: Event): void {
-    const oCtx = oEvent.getSource().getBindingContext();
+    const oSource = oEvent.getSource() as Control;
+    const oCtx = oSource.getBindingContext();
+
     if (!oCtx) {
       return;
     }
@@ -24,15 +28,15 @@ export default class SupplierList extends Controller {
   }
 
   public onOpenCreateSupplier(): void {
-    if (!this.getOwnerComponent().getModel("SupplierFormModel")) {
-      this.getOwnerComponent().setModel(new JSONModel(), "SupplierFormModel");
+    if (!this.getOwnerComponent()?.getModel("SupplierFormModel")) {
+      this.getOwnerComponent()?.setModel(new JSONModel(), "SupplierFormModel");
     }
 
-    const oFormModel = this.getOwnerComponent().getModel("SupplierFormModel") as JSONModel;
+    const oFormModel = this.getOwnerComponent()?.getModel("SupplierFormModel") as JSONModel;
 
     oFormModel.setData({
       mode: "create",
-      title: "Create supplier",
+      title: t(this.getView(), "titleCreateSupplier"),
       path: "",
       ID: null,
       Name: "",
@@ -48,26 +52,31 @@ export default class SupplierList extends Controller {
       this._supplierDialog = sap.ui.xmlfragment(
         "courseproject.view.fragments.SupplierDialog",
         this
-      ) as sap.m.Dialog;
+      ) as Dialog;
 
-      this.getView().addDependent(this._supplierDialog);
+      this.getView()?.addDependent(this._supplierDialog);
     }
 
     this._supplierDialog.open();
   }
 
   public onSupplierDialogClose(oEvent: Event): void {
-    const oButton = oEvent.getSource() as sap.m.Button;
-    const oDialog = oButton.getParent() as sap.m.Dialog;
+    const oButton = oEvent.getSource() as Button;
+    const oDialog = oButton.getParent() as Dialog;
     oDialog.close();
   }
 
   public onSaveSupplier(oEvent: Event): void {
-    const oFormModel = this.getOwnerComponent().getModel("SupplierFormModel") as JSONModel;
+    const oFormModel = this.getOwnerComponent()?.getModel("SupplierFormModel");
+
+    // * make TS happy, shouldn't happen
+    if (!oFormModel) return;
+
     const sMode = oFormModel.getProperty("/mode");
 
     if (sMode !== "create") {
-      MessageBox.error("This dialog is not in create mode.");
+      MessageBox.error(t(this.getView(), "errorNotInCreateMode"));
+
       return;
     }
 
@@ -86,24 +95,18 @@ export default class SupplierList extends Controller {
       Concurrency: 0,
     };
 
-    const oModel: any = this.getView().getModel();
+    const oModel: any = this.getView()?.getModel();
 
     oModel.create("/Suppliers", oPayload, {
-      headers: {
-        "Content-ID": 1,
-      },
+      headers: { "Content-ID": 1 },
       success: () => {
-        MessageToast.show("Supplier created");
+        MessageToast.show(t(this.getView(), "supplierCreated"));
         this.onSupplierDialogClose(oEvent);
 
         // update list
         oModel.refresh(true);
       },
-      error: (err: any) => {
-        console.log("CREATE Supplier error:", err);
-        console.log("CREATE Supplier error.responseText:", err?.responseText);
-        MessageBox.error("Create failed. Check console for details.");
-      },
+      error: () => MessageBox.error(t(this.getView(), "errorCreateFailed")),
     });
   }
 }
