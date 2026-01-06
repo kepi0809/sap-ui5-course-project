@@ -102,7 +102,7 @@ export default class SupplierDetails extends Controller {
 
     if (!this._supplierDialog) {
       this._supplierDialog = sap.ui.xmlfragment(
-        this.getView()?.getId(),
+        this.getView()!.getId(),
         "courseproject.view.fragments.SupplierDialog",
         this
       ) as Dialog;
