@@ -1,3 +1,4 @@
+import * as formatter from "courseproject/model/formatter";
 import { t } from "courseproject/util/i18n";
 import type Button from "sap/m/Button";
 import type Dialog from "sap/m/Dialog";
@@ -12,6 +13,7 @@ import FilterOperator from "sap/ui/model/FilterOperator";
 import JSONModel from "sap/ui/model/json/JSONModel";
 
 export default class SupplierDetails extends Controller {
+  public formatter = formatter;
   private _supplierDialog?: Dialog;
 
   public onInit(): void {

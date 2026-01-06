@@ -34,7 +34,7 @@
         <items>
           <ColumnListItem>
             <cells>
-              <Text text="{Name}" />
+              <Text text="{path: 'Name', formatter: '.formatter.companyName'}" />
               <Text text="{Address/ZipCode}" />
               <Text text="{Address/City}" />
               <Link text="{i18n>supplierDetailsLink}" press="onDetailsPressed" />

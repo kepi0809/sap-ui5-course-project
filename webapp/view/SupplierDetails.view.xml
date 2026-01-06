@@ -33,7 +33,7 @@
             <Text text="{ID}" />
 
             <Label text="{i18n>supplierName}" />
-            <Text text="{Name}" />
+            <Text text="{path: 'Name', formatter: '.formatter.companyName'}" />
 
             <Label text="{i18n>supplierStreet}" />
             <Text text="{Address/Street}" />
