@@ -48,7 +48,18 @@ export default class SupplierList extends Controller {
       ZipCode: "",
       Country: "",
       Concurrency: 0,
+      validation: {
+        isValid: false,
+        Name: { state: "None", text: "" },
+        Street: { state: "None", text: "" },
+        City: { state: "None", text: "" },
+        State: { state: "None", text: "" },
+        ZipCode: { state: "None", text: "" },
+        Country: { state: "None", text: "" },
+      },
     });
+
+    this.onValidateSupplierForm();
 
     if (!this._supplierDialog) {
       this._supplierDialog = sap.ui.xmlfragment(
@@ -68,19 +79,51 @@ export default class SupplierList extends Controller {
     oDialog.close();
   }
 
+  public onValidateSupplierForm(): void {
+    const oFormModel = this.getOwnerComponent()?.getModel("SupplierFormModel") as
+      | JSONModel
+      | undefined;
+    if (!oFormModel) return;
+
+    const requiredFields = ["Name", "Street", "City", "State", "ZipCode", "Country"] as const;
+
+    let isValid = true;
+
+    for (const field of requiredFields) {
+      const value = String(oFormModel.getProperty(`/${field}`) ?? "").trim();
+
+      if (!value) {
+        isValid = false;
+        oFormModel.setProperty(`/validation/${field}/state`, "Error");
+        oFormModel.setProperty(
+          `/validation/${field}/text`,
+          t(this.getView(), "validationRequired")
+        );
+      } else {
+        oFormModel.setProperty(`/validation/${field}/state`, "None");
+        oFormModel.setProperty(`/validation/${field}/text`, "");
+      }
+    }
+
+    oFormModel.setProperty("/validation/isValid", isValid);
+  }
+
   public onSaveSupplier(oEvent: Event): void {
     const oFormModel = this.getOwnerComponent()?.getModel("SupplierFormModel");
 
-    // * make TS happy, shouldn't happen
     if (!oFormModel) return;
+
+    this.onValidateSupplierForm();
+
+    const isValid = oFormModel.getProperty("/validation/isValid");
+    if (!isValid) {
+      MessageBox.error(t(this.getView(), "validationFixErrors"));
+      return;
+    }
 
     const sMode = oFormModel.getProperty("/mode");
 
-    if (sMode !== "create") {
-      MessageBox.error(t(this.getView(), "errorNotInCreateMode"));
-
-      return;
-    }
+    if (sMode !== "create") return MessageBox.error(t(this.getView(), "errorNotInCreateMode"));
 
     const oPayload: any = {
       __metadata: { type: "ODataDemo.Supplier" },
@@ -104,8 +147,6 @@ export default class SupplierList extends Controller {
       success: () => {
         MessageToast.show(t(this.getView(), "supplierCreated"));
         this.onSupplierDialogClose(oEvent);
-
-        // update list
         oModel.refresh(true);
       },
       error: () => MessageBox.error(t(this.getView(), "errorCreateFailed")),

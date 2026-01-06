@@ -87,10 +87,22 @@ export default class SupplierDetails extends Controller {
       ZipCode: oSupplier.Address?.ZipCode ?? "",
       Country: oSupplier.Address?.Country ?? "",
       Concurrency: oSupplier.Concurrency ?? 0,
+      validation: {
+        isValid: false,
+        Name: { state: "None", text: "" },
+        Street: { state: "None", text: "" },
+        City: { state: "None", text: "" },
+        State: { state: "None", text: "" },
+        ZipCode: { state: "None", text: "" },
+        Country: { state: "None", text: "" },
+      },
     });
+
+    this.onValidateSupplierForm();
 
     if (!this._supplierDialog) {
       this._supplierDialog = sap.ui.xmlfragment(
+        this.getView()?.getId(),
         "courseproject.view.fragments.SupplierDialog",
         this
       ) as Dialog;
@@ -107,8 +119,46 @@ export default class SupplierDetails extends Controller {
     oDialog.close();
   }
 
+  public onValidateSupplierForm(): void {
+    const oFormModel = this.getOwnerComponent()?.getModel("SupplierFormModel") as
+      | JSONModel
+      | undefined;
+    if (!oFormModel) return;
+
+    const requiredFields = ["Name", "Street", "City", "State", "ZipCode", "Country"] as const;
+
+    let isValid = true;
+
+    for (const field of requiredFields) {
+      const value = String(oFormModel.getProperty(`/${field}`) ?? "").trim();
+
+      if (!value) {
+        isValid = false;
+        oFormModel.setProperty(`/validation/${field}/state`, "Error");
+        oFormModel.setProperty(
+          `/validation/${field}/text`,
+          t(this.getView(), "validationRequired")
+        );
+      } else {
+        oFormModel.setProperty(`/validation/${field}/state`, "None");
+        oFormModel.setProperty(`/validation/${field}/text`, "");
+      }
+    }
+
+    oFormModel.setProperty("/validation/isValid", isValid);
+  }
+
   public onSaveSupplier(oEvent: Event): void {
     const oFormModel = this.getOwnerComponent()?.getModel("SupplierFormModel") as JSONModel;
+
+    this.onValidateSupplierForm();
+
+    const isValid = oFormModel.getProperty("/validation/isValid");
+    if (!isValid) {
+      MessageBox.error(t(this.getView(), "validationFixErrors"));
+      return;
+    }
+
     const sMode = oFormModel.getProperty("/mode");
     const sPath = oFormModel.getProperty("/path");
 
@@ -189,7 +239,6 @@ export default class SupplierDetails extends Controller {
       },
       success: (oData: any) => {
         const aResults: any[] = oData?.results ?? [];
-
         const mById = new Map<number, any>();
 
         for (const oProduct of aResults) {

@@ -4,29 +4,75 @@
       <f:SimpleForm editable="true" layout="ResponsiveGridLayout">
         <f:content>
           <Label text="{i18n>supplierName}" />
-          <Input value="{SupplierFormModel>/Name}" />
+          <Input
+            value="{SupplierFormModel>/Name}"
+            valueLiveUpdate="true"
+            liveChange="onValidateSupplierForm"
+            valueState="{SupplierFormModel>/validation/Name/state}"
+            valueStateText="{SupplierFormModel>/validation/Name/text}"
+          />
 
           <Label text="{i18n>supplierStreet}" />
-          <Input value="{SupplierFormModel>/Street}" />
+          <Input
+            value="{SupplierFormModel>/Street}"
+            valueLiveUpdate="true"
+            liveChange="onValidateSupplierForm"
+            change="onValidateSupplierForm"
+            valueState="{SupplierFormModel>/validation/Street/state}"
+            valueStateText="{SupplierFormModel>/validation/Street/text}"
+          />
 
           <Label text="{i18n>supplierCity}" />
-          <Input value="{SupplierFormModel>/City}" />
+          <Input
+            value="{SupplierFormModel>/City}"
+            valueLiveUpdate="true"
+            liveChange="onValidateSupplierForm"
+            change="onValidateSupplierForm"
+            valueState="{SupplierFormModel>/validation/City/state}"
+            valueStateText="{SupplierFormModel>/validation/City/text}"
+          />
 
           <Label text="{i18n>supplierState}" />
-          <Input value="{SupplierFormModel>/State}" />
+          <Input
+            value="{SupplierFormModel>/State}"
+            valueLiveUpdate="true"
+            liveChange="onValidateSupplierForm"
+            change="onValidateSupplierForm"
+            valueState="{SupplierFormModel>/validation/State/state}"
+            valueStateText="{SupplierFormModel>/validation/State/text}"
+          />
 
           <Label text="{i18n>supplierZip}" />
-          <Input value="{SupplierFormModel>/ZipCode}" />
+          <Input
+            value="{SupplierFormModel>/ZipCode}"
+            valueLiveUpdate="true"
+            liveChange="onValidateSupplierForm"
+            change="onValidateSupplierForm"
+            valueState="{SupplierFormModel>/validation/ZipCode/state}"
+            valueStateText="{SupplierFormModel>/validation/ZipCode/text}"
+          />
 
           <Label text="{i18n>supplierCountry}" />
-          <Input value="{SupplierFormModel>/Country}" />
+          <Input
+            value="{SupplierFormModel>/Country}"
+            valueLiveUpdate="true"
+            liveChange="onValidateSupplierForm"
+            change="onValidateSupplierForm"
+            valueState="{SupplierFormModel>/validation/Country/state}"
+            valueStateText="{SupplierFormModel>/validation/Country/text}"
+          />
         </f:content>
       </f:SimpleForm>
     </content>
 
     <buttons>
       <Button text="{i18n>button_cancel}" press="onSupplierDialogClose" />
-      <Button text="{i18n>button_save}" type="Emphasized" press="onSaveSupplier" />
+      <Button
+        text="{i18n>button_save}"
+        type="Emphasized"
+        press="onSaveSupplier"
+        enabled="{= ${SupplierFormModel>/validation/isValid} === true }"
+      />
     </buttons>
   </Dialog>
 </core:FragmentDefinition>
